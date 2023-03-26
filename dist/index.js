@@ -1,0 +1,7 @@
+'use strict';
+/*
+Countdown v0.0.1
+fedeghe <fedeghe@gmail.com>
+$description$
+*/
+const interval=require("@fedeghe/interval"),countdown=function(){function t(t,i){this.fn=t,this.horizont=i,this.to=null,this.active=!1,this.paused=!1,this._onErr=null,this._onEnd=null,this._onTick=null,this.tick=null,this.ticker=null,this.startPause=0,this.pauseSpan=0}var i=function(t){return"function"==typeof t};return t.prototype.end=function(){return this.active=!1,this._onEnd&&this._onEnd(),this.ticker&&this.ticker.clear(),clearTimeout(this.to),this},t.prototype.onEnd=function(t){return i(t)&&(this._onEnd=t),this},t.prototype.onErr=function(t){return i(t)&&(this._onErr=t),this},t.prototype.pause=function(){return this.paused=!0,this.startPause=+new Date,this.ticker&&this.ticker.pause(),this},t.prototype.resume=function(){return this.paused=!1,this.pauseSpan=+new Date-this.startPause,this.run(this.horizont-this.pauseSpan),this.ticker&&this.ticker.resume(),this},t.prototype.run=function(t){var i=this;return this.startTime=this.startTime||+new Date,this.active=!0,this.to=setTimeout(function(){try{i.end(),i.fn(),i.ticker&&i.ticker.clear()}catch(t){i._onErr&&i._onErr(t),i.active=!1}},t||this.horizont),this.ticker&&this.ticker.run(),this},t.prototype.onTick=function(t,i){var n=this;return this.ticker=interval(function(){if(n.active){var i=+new Date,e=i-n.startTime-n.pauseSpan,r=n.horizont-e;t({elapsed:e,remaining:r})}},i),this},function(i,n){return new t(i,n)}}();"object"==typeof exports&&(module.exports=countdown);
