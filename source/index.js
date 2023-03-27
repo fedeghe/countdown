@@ -1,6 +1,18 @@
 const interval = require('@fedeghe/interval'),
     countdown = (function () {
-        var isFunction = function (f) { return typeof f === 'function'; };
+        var isFunction = function (f) { return typeof f === 'function'; },
+            checkop = function (op, b) {
+                var rx = /^([*/+-]{1})?((\d{1,})(\.\d*)?)$/,
+                    m = op.match(rx),
+                    whole = '', oper;
+                if (m) {
+                    whole = m[0];
+                    oper = m[1];
+                }
+                if (!oper) whole = '+' + whole;
+                // eslint-disable-next-line no-eval
+                return m ? eval((b || 0) + '' + whole) : false;
+            };
         function Countdown (fn, horizont) {
             this.fn = fn;
             this.horizont = horizont;
@@ -14,11 +26,16 @@ const interval = require('@fedeghe/interval'),
             this.ticker = null;
             this.startPause = 0;
             this.pauseSpan = 0;
+            this.updates = 0;
+            this._onPause = null;
+            this._onResume = null;
+            this._pause = null;
+            this._resume = null;
         }
         Countdown.prototype.end = function () {
             this.active = false;
             this._onEnd && this._onEnd();
-            this.ticker && this.ticker.clear();
+            this.ticker && this.ticker.end();
             clearTimeout(this.to);
             return this;
         };
@@ -34,46 +51,72 @@ const interval = require('@fedeghe/interval'),
             }
             return this;
         };
+        Countdown.prototype.onPause = function (f) {
+            if (isFunction(f)) { this._onPause = f; } return this;
+        };
+        Countdown.prototype.onResume = function (f) {
+            if (isFunction(f)) { this._onResume = f; } return this;
+        };
         Countdown.prototype.pause = function () {
             this.paused = true;
+            this._onPause && this._onPause(this);
+            this.to && clearTimeout(this.to);
             this.startPause = +new Date();
             this.ticker && this.ticker.pause();
             return this;
         };
         Countdown.prototype.resume = function () {
             this.paused = false;
+            this._onResume && this._onResume(this);
             // reset horizont removing the pause
             this.pauseSpan = +new Date() - this.startPause;
-            this.run(this.horizont - this.pauseSpan);
+            this.horizont -= this.pauseSpan;
+            this.run(false, true);
+            // this.ticker && this.ticker.start();
             this.ticker && this.ticker.resume();
             return this;
         };
-        Countdown.prototype.run = function (newHorizont) {
+        Countdown.prototype.run = function (onStart, avoid) {
             var self = this;
             this.startTime = this.startTime || +new Date();
             this.active = true;
+            onStart && onStart(self);
             this.to = setTimeout(function () {
                 try {
-                    self.end();
                     self.fn();
-                    self.ticker && self.ticker.clear();
+                    self.end();
+                    self.ticker && self.ticker.end();
                 } catch (e) {
                     self._onErr &&
                         self._onErr(e);
                     self.active = false;
                 }
-            }, newHorizont || this.horizont);
-            this.ticker && this.ticker.run();
+            }, this.horizont);
+            !avoid && this.ticker && this.ticker.run();
             return this;
         };
+
+        Countdown.prototype.update = function (amount) {
+            this.updates = checkop(String(amount), this.updates);
+            var now = +new Date(),
+                elapsed = now - this.startTime - this.pauseSpan,
+                remaining = this.horizont - elapsed,
+                newHorizont = checkop(String(amount), remaining);
+            if (newHorizont) {
+                this.horizont = newHorizont;
+                this.to && clearTimeout(this.to);
+                this.run();
+            }
+            return this;
+        };
+
         Countdown.prototype.onTick = function (fn, tick) {
             var self = this;
-            this.ticker = interval(function () {
-                if (!self.active) return;
+            this.ticker = interval(function (cycle) {
                 var now = +new Date(),
                     elapsed = now - self.startTime - (self.pauseSpan),
-                    remaining = self.horizont - elapsed;
-                fn({ elapsed: elapsed, remaining: remaining });
+                    remaining = self.horizont - elapsed + self.updates;
+                fn({ cycle: cycle, elapsed: elapsed, remaining: remaining });
             }, tick);
             return this;
         };

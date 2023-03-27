@@ -1,6 +1,6 @@
 {
     "name": "@fedeghe/countdown",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "main": "dist/index.js",
     "repository": "git@github.com:fedeghe/countdown.git",
     "author": "fedeghe <fedeghe@gmail.com>",
@@ -18,7 +18,6 @@
         "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
     },
     "devDependencies": {
-        "@fedeghe/interval": "^1.0.14",
         "coveralls": "^3.0.4",
         "eslint": "^6.0.1",
         "eslint-config-standard": "^12.0.0",
@@ -33,5 +32,8 @@
         "mocha": "^10.2.0",
         "mocha-lcov-reporter": "^1.3.0",
         "nyc": "^14.1.1"
+    },
+    "dependencies": {
+        "@fedeghe/interval": "^1.0.17"
     }
 }
