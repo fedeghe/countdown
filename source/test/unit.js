@@ -25,21 +25,24 @@ describe('basic operations', () => {
             start = + new Date,
             end,
             pause = 5e3,
-            startPauseAfter = 1e3,
-            cd = countdown(function () {
-                end = + new Date;
+            startPauseAfter = 1e3;
+        var cd = countdown(function () {
+                
+                end = +new Date();
             }, horizont).run();
 
         setTimeout(function (){
             cd.pause()
         }, startPauseAfter)
+
         setTimeout(function (){
             cd.resume()
         }, startPauseAfter + pause)
+        
         setTimeout(function () {
             assert.equal(end- start - horizont - pause < tolerance, true);
             done();
-        }, horizont+10);
+        }, horizont+pause+10);
     }).timeout(8000);
 
 
@@ -49,6 +52,8 @@ describe('basic operations', () => {
             start = + new Date,
             end,
             pause = 1e3,
+            paused = false,
+            resumed = false,
             startPauseAfter = 1e3,
             tick = 100,
             ticks = [],
@@ -56,7 +61,9 @@ describe('basic operations', () => {
             cd = countdown(function () {
                 end = + new Date;
             }, horizont)
-            .onTick(({elapsed, remaining}) => {
+            .onPause(() => {paused = true})
+            .onResume(() => {resumed = true})
+            .onTick(({elapsed, remaining, cycle}) => {
                 ticks.push(+new Date);
             }, tick)
             .onEnd(() => {
@@ -76,9 +83,40 @@ describe('basic operations', () => {
             assert.ok(ticks.length >= 19);
             assert.ok(ticks.length <= 21);
             assert.ok(ended);
+            assert.ok(paused);
+            assert.ok(resumed);
             done();
         }, horizont + pause + 10);
     }).timeout(8000);
+
+
+
+    it('should update as expected the countdown (0.01% tolerance)', done => {
+        var horizont = 2e3,
+            tolerance = 0.01,
+            up = 1e3,
+            after = 1e3,
+            start,
+            end,
+            cd = countdown(function () {
+                end = + new Date;
+            }, horizont).run(() => {
+                start = + new Date;
+            });
+        setTimeout(function (){
+            cd.update(up);
+        }, after);
+        
+        setTimeout(function () {
+            var e = end - start;
+            assert.equal(e < (horizont+up)*(1+tolerance), true);
+            done();
+        }, horizont + up + 10);
+    }).timeout(8000);
+
+
+
+
     it('should throw an error', done => {
         var horizont = 2e3,
             failed = false;
