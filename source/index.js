@@ -27,9 +27,12 @@ const interval = require('@fedeghe/interval'),
             this.startPause = 0;
             this.pauseSpan = 0;
             this.updates = 0;
+
+            this._onUpdate = null;
+            this._update = null;
             this._onPause = null;
-            this._onResume = null;
             this._pause = null;
+            this._onResume = null;
             this._resume = null;
         }
         Countdown.prototype.end = function () {
@@ -40,22 +43,19 @@ const interval = require('@fedeghe/interval'),
             return this;
         };
         Countdown.prototype.onEnd = function (f) {
-            if (isFunction(f)) {
-                this._onEnd = f;
-            }
-            return this;
+            if (isFunction(f)) { this._onEnd = f; } return this;
         };
         Countdown.prototype.onErr = function (f) {
-            if (isFunction(f)) {
-                this._onErr = f;
-            }
-            return this;
+            if (isFunction(f)) { this._onErr = f; } return this;
         };
         Countdown.prototype.onPause = function (f) {
             if (isFunction(f)) { this._onPause = f; } return this;
         };
         Countdown.prototype.onResume = function (f) {
             if (isFunction(f)) { this._onResume = f; } return this;
+        };
+        Countdown.prototype.onUpdate = function (f) {
+            if (isFunction(f)) { this._onUpdate = f; } return this;
         };
         Countdown.prototype.pause = function () {
             this.paused = true;
@@ -88,7 +88,7 @@ const interval = require('@fedeghe/interval'),
                     self.ticker && self.ticker.end();
                 } catch (e) {
                     self._onErr &&
-                        self._onErr(e);
+                        self._onErr(e, self);
                     self.active = false;
                 }
             }, this.horizont);
@@ -102,7 +102,8 @@ const interval = require('@fedeghe/interval'),
                 elapsed = now - this.startTime - this.pauseSpan,
                 remaining = this.horizont - elapsed,
                 newHorizont = checkop(String(amount), remaining);
-            if (newHorizont) {
+            if (newHorizont && newHorizont > 0) {
+                this._onUpdate && this._onUpdate(this);
                 this.horizont = newHorizont;
                 this.to && clearTimeout(this.to);
                 this.run();

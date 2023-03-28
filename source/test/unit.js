@@ -98,10 +98,13 @@ describe('basic operations', () => {
             after = 1e3,
             start,
             end,
+            updated = false,
             cd = countdown(function () {
                 end = + new Date;
             }, horizont).run(() => {
                 start = + new Date;
+            }).onUpdate(() => {
+                updated = true;
             });
         setTimeout(function (){
             cd.update(up);
@@ -109,7 +112,8 @@ describe('basic operations', () => {
         
         setTimeout(function () {
             var e = end - start;
-            assert.equal(e < (horizont+up)*(1+tolerance), true);
+            assert.equal(e < (horizont + up) * (1 + tolerance), true);
+            assert.ok(updated);
             done();
         }, horizont + up + 10);
     }).timeout(8000);

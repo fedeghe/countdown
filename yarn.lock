@@ -104,10 +104,10 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@fedeghe/interval@^1.0.17":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@fedeghe/interval/-/interval-1.0.17.tgz#c22d6c110dd35cbb49f589cfebc0fec6983cabdb"
-  integrity sha512-CHYy9ZX8xIBmfxsRFu6K4PircNszzxvzoBYCeWkHlvs9cLXc0i+wjM+VbLixyoNzPW+iUNBegIQKYFpRbmxErw==
+"@fedeghe/interval@^1.0.18":
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/@fedeghe/interval/-/interval-1.0.18.tgz#5e7837681ed6a0893e26317315910f98ca0380d0"
+  integrity sha512-koeJwiYoYQyY3+LJKMMWbpD1/QAv6CaBW8IIfCpSUwRbR8nGjy+xveiC5j3Z+TKF683gWcFbLpIqMQWiqzi2RA==
 
 "@jridgewell/gen-mapping@^0.3.2":
   version "0.3.2"
