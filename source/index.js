@@ -13,7 +13,7 @@ const interval = require('@fedeghe/interval'),
                 // eslint-disable-next-line no-eval
                 return m ? eval((b || 0) + '' + whole) : false;
             };
-        function Countdown(fn, horizont) {
+        function Countdown (fn, horizont) {
             this.fn = fn;
             this.horizont = horizont;
             this.to = null;
