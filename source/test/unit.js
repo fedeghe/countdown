@@ -58,6 +58,7 @@ describe('basic operations', () => {
             tick = 100,
             ticks = [],
             ended = false,
+            status = false,
             cd = countdown(function () {
                 end = + new Date;
             }, horizont)
@@ -69,7 +70,11 @@ describe('basic operations', () => {
             .onEnd(() => {
                 ended = true
             })
-            .run();
+            .run( i => {
+                setTimeout(() => {
+                    status = i.getStatus();
+                }, pause)
+            });
             
         
         setTimeout(function (){
@@ -85,6 +90,8 @@ describe('basic operations', () => {
             assert.ok(ended);
             assert.ok(paused);
             assert.ok(resumed);
+            assert.ok(status.elapsed - startPauseAfter < tolerance);
+            assert.ok(status.remaining - (horizont - startPauseAfter) < tolerance);
             done();
         }, horizont + pause + 10);
     }).timeout(8000);

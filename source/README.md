@@ -75,7 +75,7 @@ returns an instance of a simple object where the following methods are available
 
     Notice: the update will happen only if the result ∈ ℝ
     
-
+- **`getStatus()`** returns an object containing current `elapsed` and `remaining` time in milliseconds
 - **`onUpdate(fn)`** to pass a function that will be invoked when update is called `fn` will be invoked receiving the instance 
 - **`onErr(fn)`** to pass a function that will handle any thrown err; fn will be invoked receiving the error and the instance 
 - **`end()`** to stop it

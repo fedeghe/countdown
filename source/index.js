@@ -13,7 +13,7 @@ const interval = require('@fedeghe/interval'),
                 // eslint-disable-next-line no-eval
                 return m ? eval((b || 0) + '' + whole) : false;
             };
-        function Countdown (fn, horizont) {
+        function Countdown(fn, horizont) {
             this.fn = fn;
             this.horizont = horizont;
             this.to = null;
@@ -96,6 +96,13 @@ const interval = require('@fedeghe/interval'),
             return this;
         };
 
+        Countdown.prototype.getStatus = function () {
+            var now = +new Date(),
+                elapsed = now - this.startTime - this.pauseSpan,
+                remaining = this.horizont - elapsed + this.updates;
+            return { elapsed: elapsed, remaining: remaining };
+        };
+
         Countdown.prototype.update = function (amount) {
             this.updates = checkop(String(amount), this.updates);
             var now = +new Date(),
@@ -115,7 +122,7 @@ const interval = require('@fedeghe/interval'),
             var self = this;
             this.ticker = interval(function (cycle) {
                 var now = +new Date(),
-                    elapsed = now - self.startTime - (self.pauseSpan),
+                    elapsed = now - self.startTime - self.pauseSpan,
                     remaining = self.horizont - elapsed + self.updates;
                 fn({ cycle: cycle, elapsed: elapsed, remaining: remaining });
             }, tick);
