@@ -1,6 +1,6 @@
 {
     "name": "@fedeghe/countdown",
-    "version": "0.0.9",
+    "version": "0.0.10",
     "main": "dist/index.js",
     "repository": "git@github.com:fedeghe/countdown.git",
     "author": "fedeghe <fedeghe@gmail.com>",
