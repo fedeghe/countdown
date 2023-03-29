@@ -105,7 +105,7 @@ describe('basic operations', () => {
     it('should update as expected the countdown (0.01% tolerance)', done => {
         var horizont = 2e3,
             tolerance = 0.01,
-            up = 1e3,
+            up = 5e3,
             after = 1e3,
             start,
             end,
@@ -119,15 +119,18 @@ describe('basic operations', () => {
             });
         setTimeout(function (){
             cd.update(up);
+            cd.update(up);
+            cd.update(up);
+            cd.update(up);
         }, after);
         
         setTimeout(function () {
             var e = end - start;
-            assert.equal(e < (horizont + up) * (1 + tolerance), true);
+            assert.equal(e < (horizont + up*4) * (1 + tolerance), true);
             assert.ok(updated);
             done();
-        }, horizont + up + 10);
-    }).timeout(8000);
+        }, horizont + up*4 + 10);
+    }).timeout(25000);
 
 
 

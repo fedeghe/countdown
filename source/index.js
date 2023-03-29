@@ -16,6 +16,7 @@ const interval = require('@fedeghe/interval'),
         function Countdown (fn, horizont) {
             this.fn = fn;
             this.horizont = horizont;
+            this.baseHorizont = horizont;
             this.to = null;
             this.active = false;
             this.paused = false;
@@ -35,6 +36,7 @@ const interval = require('@fedeghe/interval'),
             this._onResume = null;
             this._resume = null;
         }
+
         Countdown.prototype.end = function () {
             this.active = false;
             this._onEnd && this._onEnd();
@@ -42,21 +44,17 @@ const interval = require('@fedeghe/interval'),
             clearTimeout(this.to);
             return this;
         };
-        Countdown.prototype.onEnd = function (f) {
-            if (isFunction(f)) { this._onEnd = f; } return this;
-        };
-        Countdown.prototype.onErr = function (f) {
-            if (isFunction(f)) { this._onErr = f; } return this;
-        };
-        Countdown.prototype.onPause = function (f) {
-            if (isFunction(f)) { this._onPause = f; } return this;
-        };
-        Countdown.prototype.onResume = function (f) {
-            if (isFunction(f)) { this._onResume = f; } return this;
-        };
-        Countdown.prototype.onUpdate = function (f) {
-            if (isFunction(f)) { this._onUpdate = f; } return this;
-        };
+
+        Countdown.prototype.onEnd = function (f) { if (isFunction(f)) { this._onEnd = f; } return this; };
+
+        Countdown.prototype.onErr = function (f) { if (isFunction(f)) { this._onErr = f; } return this; };
+
+        Countdown.prototype.onPause = function (f) { if (isFunction(f)) { this._onPause = f; } return this; };
+
+        Countdown.prototype.onResume = function (f) { if (isFunction(f)) { this._onResume = f; } return this; };
+
+        Countdown.prototype.onUpdate = function (f) { if (isFunction(f)) { this._onUpdate = f; } return this; };
+
         Countdown.prototype.pause = function () {
             this.paused = true;
             this._onPause && this._onPause(this);
@@ -65,6 +63,7 @@ const interval = require('@fedeghe/interval'),
             this.ticker && this.ticker.pause();
             return this;
         };
+
         Countdown.prototype.resume = function () {
             this.paused = false;
             this._onResume && this._onResume(this);
@@ -75,6 +74,13 @@ const interval = require('@fedeghe/interval'),
             // this.ticker && this.ticker.start();
             this.ticker && this.ticker.resume();
             return this;
+        };
+        Countdown.prototype.getStatus = function () {
+            var now = +new Date(),
+                elapsed = now - this.startTime - this.pauseSpan,
+                remaining = this.horizont - elapsed + this.updates,
+                progress = 100 * elapsed / this.horizont;
+            return { elapsed: elapsed, remaining: remaining, progress: progress };
         };
         Countdown.prototype.run = function (onStart, avoid) {
             var self = this;
@@ -96,20 +102,13 @@ const interval = require('@fedeghe/interval'),
             return this;
         };
 
-        Countdown.prototype.getStatus = function () {
-            var now = +new Date(),
-                elapsed = now - this.startTime - this.pauseSpan,
-                remaining = this.horizont - elapsed + this.updates,
-                progress = 100 * elapsed / this.horizont;
-            return { elapsed: elapsed, remaining: remaining, progress: progress };
-        };
-
         Countdown.prototype.update = function (amount) {
-            this.updates = checkop(String(amount), this.updates);
+            this.updates = checkop(String(amount));
             var now = +new Date(),
                 elapsed = now - this.startTime - this.pauseSpan,
-                remaining = this.horizont - elapsed,
+                remaining = this.baseHorizont - elapsed,
                 newHorizont = checkop(String(amount), remaining);
+            this.baseHorizont = elapsed + newHorizont;
             if (newHorizont && newHorizont > 0) {
                 this._onUpdate && this._onUpdate(this);
                 this.horizont = newHorizont;
@@ -124,12 +123,13 @@ const interval = require('@fedeghe/interval'),
             this.ticker = interval(function (cycle) {
                 var now = +new Date(),
                     elapsed = now - self.startTime - self.pauseSpan,
-                    remaining = self.horizont - elapsed + self.updates,
-                    progress = 100 * elapsed / self.horizont;
+                    remaining = self.baseHorizont - elapsed,
+                    progress = 100 * elapsed / self.baseHorizont;
                 fn({ cycle: cycle, elapsed: elapsed, remaining: remaining, progress: progress });
             }, tick);
             return this;
         };
+
         return function (fn, horizont) {
             return new Countdown(fn, horizont);
         };
