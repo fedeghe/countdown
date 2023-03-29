@@ -1,6 +1,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/fedeghe/countdown/badge.svg?branch=master)](https://coveralls.io/github/fedeghe/countdown?branch=master)
 
-# countdown <sub><small>(v. 0.0.10)</small></sub>
+# countdown <sub><small>(v. 0.0.11)</small></sub>
 
 A really simple function to provide and extended version of `[native] setTimeout` which can be
 - paused / resumed
@@ -53,7 +53,7 @@ countdown(function () {
     .onTick(({ remaining, elapsed, cycle, progress }) => {
         console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
     }, 100)
-    .onUpdate(() => console.log(`updating after ${+new Date() - start}`);)
+    .onUpdate(() => console.log(`updating after ${+new Date() - start}`))
     // run is not, if we want to start the countdown
     .run(i => {
         start = +new Date();

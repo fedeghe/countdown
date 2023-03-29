@@ -53,7 +53,7 @@ countdown(function () {
     .onTick(({ remaining, elapsed, cycle, progress }) => {
         console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
     }, 100)
-    .onUpdate(() => console.log(`updating after ${+new Date() - start}`);)
+    .onUpdate(() => console.log(`updating after ${+new Date() - start}`))
     // run is not, if we want to start the countdown
     .run(i => {
         start = +new Date();

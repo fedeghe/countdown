@@ -1,6 +1,6 @@
 'use strict';
 /*
-Countdown v0.0.10
+Countdown v0.0.11
 fedeghe <fedeghe@gmail.com>
 $description$
 */
