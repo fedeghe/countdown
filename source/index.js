@@ -114,7 +114,7 @@ const interval = require('@fedeghe/interval'),
                 var now = +new Date(),
                     elapsed = now - self.startTime - self.pauseSpan,
                     remaining = self.baseHorizont - elapsed,
-                    progress = (100 * elapsed / self.baseHorizont).toFixed(3);
+                    progress = parseFloat((100 * elapsed / self.baseHorizont).toFixed(3), 10);
                 fn({ cycle: cycle, elapsed: elapsed, remaining: remaining, progress: progress });
             }, tick);
             return this;

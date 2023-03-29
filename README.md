@@ -1,6 +1,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/fedeghe/countdown/badge.svg?branch=master)](https://coveralls.io/github/fedeghe/countdown?branch=master)
 
-# countdown <sub><small>(v. 0.0.9)</small></sub>
+# countdown <sub><small>(v. 0.0.10)</small></sub>
 
 A really simple function to provide and extended version of `[native] setTimeout` which can be
 - paused / resumed
