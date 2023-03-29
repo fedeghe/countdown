@@ -1,18 +1,6 @@
 const interval = require('@fedeghe/interval'),
     countdown = (function () {
-        var isFunction = function (f) { return typeof f === 'function'; },
-            checkop = function (op, b) {
-                var rx = /^([*/+-]{1})?((\d{1,})(\.\d*)?)$/,
-                    m = op.match(rx),
-                    whole = '', oper;
-                if (m) {
-                    whole = m[0];
-                    oper = m[1];
-                }
-                if (!oper) whole = '+' + whole;
-                // eslint-disable-next-line no-eval
-                return m ? eval((b || 0) + '' + whole) : false;
-            };
+        var isFunction = function (f) { return typeof f === 'function'; };
         function Countdown (fn, horizont) {
             this.fn = fn;
             this.horizont = horizont;
@@ -103,11 +91,13 @@ const interval = require('@fedeghe/interval'),
         };
 
         Countdown.prototype.update = function (amount) {
-            this.updates = checkop(String(amount));
+            var am = parseInt(amount);
+            this.updates = am;
+            // eslint-disable-next-line one-var
             var now = +new Date(),
                 elapsed = now - this.startTime - this.pauseSpan,
                 remaining = this.baseHorizont - elapsed,
-                newHorizont = checkop(String(amount), remaining);
+                newHorizont = am + remaining;
             this.baseHorizont = elapsed + newHorizont;
             if (newHorizont && newHorizont > 0) {
                 this._onUpdate && this._onUpdate(this);
@@ -124,7 +114,7 @@ const interval = require('@fedeghe/interval'),
                 var now = +new Date(),
                     elapsed = now - self.startTime - self.pauseSpan,
                     remaining = self.baseHorizont - elapsed,
-                    progress = 100 * elapsed / self.baseHorizont;
+                    progress = (100 * elapsed / self.baseHorizont).toFixed(3);
                 fn({ cycle: cycle, elapsed: elapsed, remaining: remaining, progress: progress });
             }, tick);
             return this;

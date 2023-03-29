@@ -1,6 +1,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/fedeghe/countdown/badge.svg?branch=master)](https://coveralls.io/github/fedeghe/countdown?branch=master)
 
-# countdown <sub><small>(v. 0.0.8)</small></sub>
+# countdown <sub><small>(v. 0.0.9)</small></sub>
 
 A really simple function to provide and extended version of `[native] setTimeout` which can be
 - paused / resumed
@@ -8,49 +8,91 @@ A really simple function to provide and extended version of `[native] setTimeout
 - have a ticking function
 
 ``` js
+let end, start;
 countdown(function () {
     // this will be called when the countdown is over
-    console.log('END: ', +new Date());
+    end = +new Date();
+    console.log(`ENDED in ${end-start}ms`, +new Date());
 }, 1000)
 // onTick is optional
-.onTick(({ remaining, elapsed, cycle }) => {
-    console.log(`tick ${cycle} : `, remaining, elapsed, +new Date());
+.onTick(({ remaining, elapsed, cycle, progress }) => {
+    console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
 }, 100)
 // run is not, if we want to start the countdown
 .run(() => {
-    console.log(`STARTED: ${+new Date()}`)
+    start = +new Date();
+    console.log(`STARTED at ${start}`)
 });
 ```
 will produce
 ```
-STARTED: 1679957709007
-tick 0 :  899 101 1679957709109
-tick 1 :  799 201 1679957709208
-tick 2 :  697 303 1679957709310
-tick 3 :  593 407 1679957709414
-tick 4 :  496 504 1679957709511
-tick 5 :  399 601 1679957709608
-tick 6 :  298 702 1679957709709
-tick 7 :  199 801 1679957709808
-tick 8 :  99 901 1679957709908
-tick 9 :  -2 1002 1679957710009
-END:  1679957710035
-```
-on longer runs the stability of the ticking function is anyway quite good since internally it is dinamically changing, thus trying with 60 seconds for example one gets:
-```
-ticking: 59898 102 1679868459589
-ticking: 59800 200 1679868459686
-ticking: 59699 301 1679868459787
-...
-...
-...
-ticking: 299 59701 1679868519187
-ticking: 198 59802 1679868519288
-ticking: 100 59900 1679868519386
-END: 1679868519487
+STARTED at 1680118831385
+tick #0 : 10.1% [899 | 101] 1680118831487
+tick #1 : 20.1% [799 | 201] 1680118831586
+tick #2 : 30.1% [699 | 301] 1680118831686
+tick #3 : 40.1% [599 | 401] 1680118831786
+tick #4 : 50.2% [498 | 502] 1680118831887
+tick #5 : 60.1% [399 | 601] 1680118831986
+tick #6 : 70.2% [298 | 702] 1680118832087
+tick #7 : 80.1% [199 | 801] 1680118832186
+tick #8 : 90.2% [98 | 902] 1680118832287
+tick #9 : 100.1% [-1 | 1001] 1680118832386
+ENDED in 1008ms 1680118832393
 ```
 
 
+<details>
+<summary>but one might want to add or subtract time while running</summary>
+
+``` js
+var start, end;
+countdown(function () {
+    end = +new Date();
+    console.log(`ENDED in ${end-start}ms`, +new Date());
+}, 1000)
+    .onTick(({ remaining, elapsed, cycle, progress }) => {
+        console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
+    }, 100)
+    .onUpdate(() => console.log(`updating after ${+new Date() - start}`);)
+    // run is not, if we want to start the countdown
+    .run(i => {
+        start = +new Date();
+        console.log(`STARTED at ${start}`);
+        setTimeout(() => i.update(1000), 500);
+        setTimeout(() => i.update(-300), 700);
+    });
+```
+getting
+```
+STARTED at 1680120475512
+tick #0 : 10.100% [899 | 101] 1680120475613
+tick #1 : 20.100% [799 | 201] 1680120475713
+tick #2 : 30.100% [699 | 301] 1680120475813
+tick #3 : 40.100% [599 | 401] 1680120475913
+tick #4 : 50.100% [499 | 501] 1680120476013
+updating after 510
+tick #6 : 30.050% [1399 | 601] 1680120476113
+tick #7 : 35.050% [1299 | 701] 1680120476213
+updating after 709
+tick #9 : 47.059% [900 | 800] 1680120476312
+tick #10 : 53.000% [799 | 901] 1680120476413
+tick #11 : 58.824% [700 | 1000] 1680120476512
+tick #12 : 64.765% [599 | 1101] 1680120476614
+tick #13 : 70.647% [499 | 1201] 1680120476713
+tick #14 : 76.471% [400 | 1300] 1680120476812
+tick #15 : 82.353% [300 | 1400] 1680120476912
+tick #16 : 88.353% [198 | 1502] 1680120477014
+tick #17 : 94.176% [99 | 1601] 1680120477113
+ENDED in 1700ms 1680120477212
+```
+
+</details>
+
+
+
+---
+---
+---
 
 
 ### _API_
@@ -63,26 +105,15 @@ returns an instance of a simple object where the following methods are available
 - **`run(ƒn)`** to start it, optionally accepts a function that will be called once started receiving the countdown instance
 
 - **`onTick(fn, tickInterval)`** to pass a function that will be called with a tick interval passing an object `{cycle, remaining, elapsed, progress}` 
-- **`update(exp)`** to update the event horizont in milliseconds, it can be used to add subtract time to the horizont and to divide and multiply it:  
-
-    | exp | effect |
-    |-----|--------|
-    | 1000 | add 1000 ms |
-    | "+1000" | add 1000 ms |
-    | "-1000" | subtract 1000 ms |
-    | "*2" | double the current horizont |
-    | "/2" | halve the current horizont |
-
-    Notice: the update will happen only if the result ∈ ℝ
-    
+- **`update(number)`** to live add (positive number) or remove (negative number) `number` milliseconds to the event horizont    
 - **`getStatus()`** returns an object `{remaining, elapsed, progress}`
 - **`onUpdate(fn)`** to pass a function that will be invoked when update is called `fn` will be invoked receiving the instance 
-- **`onErr(fn)`** to pass a function that will handle any thrown err; fn will be invoked receiving the error and the instance 
+- **`onErr(fn)`** to pass a function that will handle any thrown err; `fn` will be invoked receiving the error and the instance 
 - **`end()`** to stop it
-- **`onEnd(fn)`** to pass a function that will be called additionally when `end` will be called; fn will be invoked receiving the instance 
+- **`onEnd(fn)`** to pass a function that will be called additionally when `end` will be called; `fn` will be invoked receiving the instance 
 - **`pause()`** to pause it manually
-- **`onPause(fn)`** to pass a function that will be called when `pause` will be called; fn will be invoked receiving the instance   
+- **`onPause(fn)`** to pass a function that will be called when `pause` will be called; `fn` will be invoked receiving the instance   
 - **`resume()`** to resume it manually
-- **`onResume(fn)`** to pass a function that will be called when `resume` will be called; fn will be invoked receiving the instance   
+- **`onResume(fn)`** to pass a function that will be called when `resume` will be called; `fn` will be invoked receiving the instance   
 
 
