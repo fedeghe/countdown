@@ -1,6 +1,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/fedeghe/countdown/badge.svg?branch=master)](https://coveralls.io/github/fedeghe/countdown?branch=master)
 
-# countdown <sub><small>(v. 0.0.6)</small></sub>
+# countdown <sub><small>(v. 0.0.7)</small></sub>
 
 A really simple function to provide and extended version of `[native] setTimeout` which can be
 - paused / resumed
@@ -62,7 +62,7 @@ returns an instance of a simple object where the following methods are available
 
 - **`run(ƒn)`** to start it, optionally accepts a function that will be called once started receiving the countdown instance
 
-- **`onTick(fn, tickInterval)`** to pass a function that will be called with a tick interval passing an object `{cycle, remaining, elapsed}` 
+- **`onTick(fn, tickInterval)`** to pass a function that will be called with a tick interval passing an object `{cycle, remaining, elapsed, progress}` 
 - **`update(exp)`** to update the event horizont in milliseconds, it can be used to add subtract time to the horizont and to divide and multiply it:  
 
     | exp | effect |
@@ -75,7 +75,7 @@ returns an instance of a simple object where the following methods are available
 
     Notice: the update will happen only if the result ∈ ℝ
     
-- **`getStatus()`** returns an object containing current `elapsed` and `remaining` time in milliseconds
+- **`getStatus()`** returns an object `{remaining, elapsed, progress}`
 - **`onUpdate(fn)`** to pass a function that will be invoked when update is called `fn` will be invoked receiving the instance 
 - **`onErr(fn)`** to pass a function that will handle any thrown err; fn will be invoked receiving the error and the instance 
 - **`end()`** to stop it

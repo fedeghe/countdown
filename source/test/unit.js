@@ -59,12 +59,14 @@ describe('basic operations', () => {
             ticks = [],
             ended = false,
             status = false,
+            progresses = [],
             cd = countdown(function () {
                 end = + new Date;
             }, horizont)
             .onPause(() => {paused = true})
             .onResume(() => {resumed = true})
-            .onTick(({elapsed, remaining, cycle}) => {
+            .onTick(({elapsed, remaining, cycle, progress}) => {
+                progresses.push(progress);
                 ticks.push(+new Date);
             }, tick)
             .onEnd(() => {
@@ -90,8 +92,10 @@ describe('basic operations', () => {
             assert.ok(ended);
             assert.ok(paused);
             assert.ok(resumed);
+            assert.ok(progresses.length && progresses.reduce((a, s) => a + s, 0) > 0);
             assert.ok(status.elapsed - startPauseAfter < tolerance);
             assert.ok(status.remaining - (horizont - startPauseAfter) < tolerance);
+            assert.ok(status.progress > 45 && status.progress < 55);
             done();
         }, horizont + pause + 10);
     }).timeout(8000);

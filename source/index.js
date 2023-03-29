@@ -99,8 +99,9 @@ const interval = require('@fedeghe/interval'),
         Countdown.prototype.getStatus = function () {
             var now = +new Date(),
                 elapsed = now - this.startTime - this.pauseSpan,
-                remaining = this.horizont - elapsed + this.updates;
-            return { elapsed: elapsed, remaining: remaining };
+                remaining = this.horizont - elapsed + this.updates,
+                progress = 100 * elapsed / this.horizont;
+            return { elapsed: elapsed, remaining: remaining, progress: progress };
         };
 
         Countdown.prototype.update = function (amount) {
@@ -123,8 +124,9 @@ const interval = require('@fedeghe/interval'),
             this.ticker = interval(function (cycle) {
                 var now = +new Date(),
                     elapsed = now - self.startTime - self.pauseSpan,
-                    remaining = self.horizont - elapsed + self.updates;
-                fn({ cycle: cycle, elapsed: elapsed, remaining: remaining });
+                    remaining = self.horizont - elapsed + self.updates,
+                    progress = 100 * elapsed / self.horizont;
+                fn({ cycle: cycle, elapsed: elapsed, remaining: remaining, progress: progress });
             }, tick);
             return this;
         };
