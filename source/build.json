@@ -3,7 +3,7 @@
         "rm -rf dist test",
         "mkdir dist test"
     ],
-    "#source/index.js": "dist -plugins=malta-js-uglify...malta-header-comment[name:\"source/header.txt\"]",
-    "#source/test/unit.js": "test",
+    "#source/index.js": "dist -plugins=malta-js-uglify...malta-header-comment[name:\"source/header.txt\"]  -options=placeholderMode:'func'",
+    "#source/test/unit.js": "test  -options=placeholderMode:'func'",
     "#source/README.md": "."
 }

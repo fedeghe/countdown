@@ -1,8 +1,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/fedeghe/countdown/badge.svg?branch=master)](https://coveralls.io/github/fedeghe/countdown?branch=master)
 
-# countdown <sub><small>(v. 0.0.11)</small></sub>
+# countdown <sub><small>(v. 0.0.13)</small></sub>
 
-A really simple function to provide and extended version of `[native] setTimeout` which can be
+A really simple function to provide and extended isomorphic version of the native `setTimeout` which can be
 - paused / resumed
 - updated while running
 - have a ticking function

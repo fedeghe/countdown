@@ -45,7 +45,6 @@ describe('basic operations', () => {
         }, horizont+pause+10);
     }).timeout(8000);
 
-
     it('should pause-resume using a ticker and end within a good range (2s run, 5 s pause in the middle, 0.01% tolerance)', done => {
         var horizont = 2e3,
             tolerance = horizont * 0.01,
@@ -100,8 +99,6 @@ describe('basic operations', () => {
         }, horizont + pause + 10);
     }).timeout(8000);
 
-
-
     it('should update as expected the countdown (0.01% tolerance)', done => {
         var horizont = 2e3,
             tolerance = 0.01,
@@ -132,9 +129,6 @@ describe('basic operations', () => {
         }, horizont + up*4 + 10);
     }).timeout(25000);
 
-
-
-
     it('should throw an error', done => {
         var horizont = 2e3,
             failed = false;
@@ -152,6 +146,4 @@ describe('basic operations', () => {
             done();
         }, horizont + 10);
     }).timeout(8000);
-
-
 });
