@@ -7,7 +7,6 @@
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly",
-        "maltaF": "readonly"
     },
     "parserOptions": {
         "ecmaVersion": 2018
