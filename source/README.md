@@ -2,7 +2,7 @@
 
 # countdown <sub><small>(v. $PACKAGE.version$)</small></sub>
 
-A really simple function to provide and extended version of `[native] setTimeout` which can be
+A really simple function to provide and extended isomorphic version of the native `setTimeout` which can be
 - paused / resumed
 - updated while running
 - have a ticking function
