@@ -1,6 +1,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/fedeghe/countdown/badge.svg?branch=master)](https://coveralls.io/github/fedeghe/countdown?branch=master)
 
-# countdown <sub><small>(v. 0.0.14)</small></sub>
+# countdown <sub><small>(v. 0.0.15)</small></sub>
 
 A really simple function to provide and extended version of the native `setTimeout` which can be
 - paused / resumed
@@ -9,18 +9,16 @@ A really simple function to provide and extended version of the native `setTimeo
 
 ``` js
 let end, start;
-countdown(function () {
-    // this will be called when the countdown is over
-    end = +new Date();
-    console.log(`ENDED in ${end-start}ms`, +new Date());
-}, 1000)
-// onTick is optional
-.onTick(({ remaining, elapsed, cycle, progress }) => {
-    console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
-}, 100)
+countdown(function ({ at }) {
+        console.log(`ENDED in ${at-start}ms (${at})`);
+    },1000,
+    ({ remaining, elapsed, cycle, progress }) => {
+        console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
+    },100
+)
 // run is not, if we want to start the countdown
-.run(() => {
-    start = +new Date();
+.run(({ at }) => {
+    start = at;
     console.log(`STARTED at ${start}`)
 });
 ```
@@ -37,7 +35,7 @@ tick #6 : 70.2% [298 | 702] 1680118832087
 tick #7 : 80.1% [199 | 801] 1680118832186
 tick #8 : 90.2% [98 | 902] 1680118832287
 tick #9 : 100.1% [-1 | 1001] 1680118832386
-ENDED in 1008ms 1680118832393
+ENDED in 1008ms
 ```
 
 
@@ -46,21 +44,22 @@ ENDED in 1008ms 1680118832393
 
 ``` js
 var start, end;
-countdown(function () {
-    end = +new Date();
-    console.log(`ENDED in ${end-start}ms`, +new Date());
-}, 1000)
-    .onTick(({ remaining, elapsed, cycle, progress }) => {
+countdown(() => {
+        end = +new Date();
+        console.log(`ENDED in ${end-start}ms`, +new Date());
+    }, 1000,
+    ({ remaining, elapsed, cycle, progress }) => {
         console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
-    }, 100)
-    .onUpdate(() => console.log(`updating after ${+new Date() - start}`))
-    // run is not, if we want to start the countdown
-    .run(i => {
-        start = +new Date();
-        console.log(`STARTED at ${start}`);
-        setTimeout(() => i.update(1000), 500);
-        setTimeout(() => i.update(-300), 700);
-    });
+    }, 100
+)
+.onUpdate(() => console.log(`updating after ${+new Date() - start}`))
+// run is not, if we want to start the countdown
+.run(i => {
+    start = +new Date();
+    console.log(`STARTED at ${start}`);
+    setTimeout(() => i.update(1000), 500);
+    setTimeout(() => i.update(-300), 700);
+});
 ```
 getting
 ```
@@ -98,13 +97,16 @@ ENDED in 1700ms 1680120477212
 ### _API_
 the `countdown` function expects as parameters:  
 - **a function** : meant to be executed when the countdown is over 
-- **an integer**: the _"event horizont"_; number of milliseconds for the coundown to complete 
+- **an integer**: the _"event horizont"_; number of milliseconds for the coundown to complete  
+- _a function_ : meant to be executed when ticking  
+- _an integer_: the _"tick period"_; number of milliseconds between two consequtive ticks   
+
 
 returns an instance of a simple object where the following methods are available:  
 
 - **`run(ƒn)`** to start it, optionally accepts a function that will be called once started receiving the countdown instance
 
-- **`onTick(fn, tickInterval)`** to pass a function that will be called with a tick interval passing an object `{cycle, remaining, elapsed, progress}` 
+
 - **`update(number)`** to live add (positive number) or remove (negative number) `number` milliseconds to the event horizont    
 - **`getStatus()`** returns an object `{remaining, elapsed, progress}`
 - **`onUpdate(fn)`** to pass a function that will be invoked when update is called `fn` will be invoked receiving the instance 
