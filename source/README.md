@@ -9,17 +9,22 @@ A really simple function to provide and extended version of the native `setTimeo
 
 ``` js
 let end, start;
-countdown(function ({ at }) {
-        console.log(`ENDED in ${at-start}ms (${at})`);
-    },1000,
-    ({ remaining, elapsed, cycle, progress }) => {
-        console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
-    },100
+countdown(
+    ({ at }) =>
+        console.log(`ENDED in ${at-start}ms (${at})`),
+    1000,
+    ({ remaining, elapsed, cycle, progress, at }) => 
+        console.log(
+            `tick #${cycle} : ${progress}%`,
+            `[${remaining} | ${elapsed}]`,
+            at
+        ),
+    100
 )
 // run is not, if we want to start the countdown
 .run(({ at }) => {
     start = at;
-    console.log(`STARTED at ${start}`)
+    console.log(`STARTED at ${start}`);
 });
 ```
 will produce
@@ -44,21 +49,27 @@ ENDED in 1008ms
 
 ``` js
 var start, end;
-countdown(() => {
-        end = +new Date();
-        console.log(`ENDED in ${end-start}ms`, +new Date());
-    }, 1000,
-    ({ remaining, elapsed, cycle, progress }) => {
-        console.log(`tick #${cycle} : ${progress}% [${remaining} | ${elapsed}]`, +new Date());
-    }, 100
+countdown(
+    ({ at }) => 
+        console.log(`ENDED in ${at-start}ms`, at),
+    1000,
+    ({ remaining, elapsed, cycle, progress, at }) => 
+        console.log(
+            `tick #${cycle} : ${progress}%`,
+            `[${remaining} | ${elapsed}]`,
+            at
+        ),
+    100
 )
-.onUpdate(() => console.log(`updating after ${+new Date() - start}`))
+.onTune(({ at }) =>
+    console.log(`updating after ${at - start}`)
+)
+.at(500, ({ i }) => i.tune(1000))
+.at(700, ({ i }) => i.tune(-300))
 // run is not, if we want to start the countdown
-.run(i => {
-    start = +new Date();
+.run(({ at }) => {
+    start = at;
     console.log(`STARTED at ${start}`);
-    setTimeout(() => i.update(1000), 500);
-    setTimeout(() => i.update(-300), 700);
 });
 ```
 getting
@@ -95,11 +106,13 @@ ENDED in 1700ms 1680120477212
 
 
 ### _API_
-the `countdown` function expects as parameters:  
-- **a function** : meant to be executed when the countdown is over 
-- **an integer**: the _"event horizont"_; number of milliseconds for the coundown to complete  
-- _a function_ : meant to be executed when ticking  
-- _an integer_: the _"tick period"_; number of milliseconds between two consequtive ticks   
+**`countdown(endƒn, horizont ms, tickƒn, tick ms)`**  
+
+factory method expects as parameters:  
+- **endƒn** \<ƒunction\> : meant to be executed when the countdown is over 
+- **horizont** \<integer\>: the _"event horizont"_; number of milliseconds for the coundown to complete  
+- _tickƒn_ \<tickƒn\>: meant to be executed when ticking  (default () => {})
+- _tick_ \<integer\>: the _"tick period"_; number of milliseconds between two consequtive ticks (default 100ms))  
 
 
 returns an instance of a simple object where the following methods are available:  
@@ -107,15 +120,24 @@ returns an instance of a simple object where the following methods are available
 - **`run(ƒn)`** to start it, optionally accepts a function that will be called once started receiving the countdown instance
 
 
-- **`update(number)`** to live add (positive number) or remove (negative number) `number` milliseconds to the event horizont    
-- **`getStatus()`** returns an object `{remaining, elapsed, progress}`
-- **`onUpdate(fn)`** to pass a function that will be invoked when update is called `fn` will be invoked receiving the instance 
-- **`onErr(fn)`** to pass a function that will handle any thrown err; `fn` will be invoked receiving the error and the instance 
-- **`end()`** to stop it
-- **`onEnd(fn)`** to pass a function that will be called additionally when `end` will be called; `fn` will be invoked receiving the instance 
-- **`pause()`** to pause it manually
-- **`onPause(fn)`** to pass a function that will be called when `pause` will be called; `fn` will be invoked receiving the instance   
+- **`pause(_slide_ <bool>)`** to pause it manually; when a truthy value is passed for _slide_ then this pause will not only stop the tick notifications (if any set) but will also slide forward the end of the countdown set as _horizont_.
 - **`resume()`** to resume it manually
-- **`onResume(fn)`** to pass a function that will be called when `resume` will be called; `fn` will be invoked receiving the instance   
+- **`tune(number)`** to live add (positive number) or remove (negative number) `number` milliseconds to the event horizont    
+- **`end()`** to stop it
+- **`getStatus()`** returns an object `{remaining, elapsed, progress}`
+
+- **`onPause(ƒn)`** to pass a function that will be called when `pause` will be called; `ƒn` will be invoked receiving _**some info**_   
+- **`onResume(ƒn)`** to pass a function that will be called when `resume` will be called; `ƒn` will be invoked receiving _**some info**_   
+- **`onTune(ƒn)`** to pass a function that will be invoked when tune is called `ƒn` will be invoked receiving _**some info**_ 
+- **`onEnd(ƒn)`** to pass a function that will be called additionally when `end` will be called; `ƒn` will be invoked receiving _**some info**_ 
+- **`onErr(ƒn)`** to pass a function that will handle any thrown err; `ƒn` will be invoked receiving the error and _**some info**_ 
 
 
+_**some info**_ consists in a object containing: 
+- **`at`**: the epoch of the event 
+- **`cycle`**: an integer containing the currect cycle of notification  
+- **`elapsed`**: the elapsed time (pauses included)   
+- **`effective`**: the elapsed time (pauses excluded)
+- **`remaining`**: the remaining time
+- **`progress`**: the progress percentage (float, precision 3)
+- **`status`**: the status of the instance among `['init', 'running', 'paused', 'ended', 'error']`
