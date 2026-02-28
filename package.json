@@ -15,7 +15,7 @@
         "lint": "eslint source",
         "test": "jest --coverage --rootDir=tests",
         "watch": "jest --watch --coverage --rootDir=tests",
-        "cover": "jest --coverage --rootDir=tests  --coverageReporters=text"
+        "cover": "jest --coverage --rootDir=tests --coverageReporters=text --coverageReporters=lcov"
     },
     "devDependencies": {
         "eslint": "^6.0.1",
