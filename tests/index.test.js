@@ -1,8 +1,7 @@
-var assert = require('assert'),
-    countdown = require('../dist/index.js');
+var countdown = require('../dist/index.js');
 
 describe('basic operations', () => {
-    
+    jest.setTimeout(30000);
     it('should end within a good range, use at,onStart,onEnd,getStatus (2s run, 0.01% tolerance)', done => {
         var horizont = 2e3,
             tolerance = horizont * 0.01,
@@ -25,20 +24,20 @@ describe('basic operations', () => {
         setTimeout(() => (status = cd.getStatus()), 450);
 
         setTimeout(function () {
-            assert.equal(end- start - horizont < tolerance, true);
-            assert.ok(started);
-            assert.ok(ended);
-            assert.ok(ated);
-            assert.ok(elapsed >= horizont);
-            assert.ok(elapsed <= horizont + tolerance);
-            assert.ok(status.elapsed >= 450);
-            assert.ok(status.elapsed <= 450 * (1.01));
+            expect(end- start - horizont < tolerance).toBe(true);
+            expect(started).toBe(true);
+            expect(ended).toBe(true);
+            expect(ated).toBe(true);
+            expect(elapsed >= horizont).toBe(true);
+            expect(elapsed <= horizont + tolerance).toBe(true);
+            expect(status.elapsed >= 450).toBe(true);
+            expect(status.elapsed <= 450 * (1.01)).toBe(true);
         
             done();
         }, horizont + 10);
         
-    }).timeout(3000);
-
+    });
+//jest.setTimeout(8000);
     it('should pause-resume and end within a good range (2s run, 5 s pause in the middle, 0.01% tolerance)', done => {
         var horizont = 2e3,
             tolerance = horizont * 0.01,
@@ -57,11 +56,12 @@ describe('basic operations', () => {
             ci.resume()
         }, startPauseAfter + pause);
         setTimeout(function () {
-            assert.equal(end- start - horizont - pause < tolerance, true);
+            expect(end- start - horizont - pause < tolerance).toBe(true);
             done();
         }, horizont+pause+10);
-    }).timeout(8000);
+    });
 
+    //jest.setTimeout(8000);
     it('should pause-resume using a ticker and end within a good range (2s run, 5 s pause in the middle, 0.01% tolerance)', done => {
         var horizont = 2e3,
             tolerance = horizont * 0.01,
@@ -98,20 +98,21 @@ describe('basic operations', () => {
         }, startPauseAfter + pause);
             
         setTimeout(function () {
-            assert.equal(end- start - horizont - pause < tolerance, true);
-            assert.ok(ticks.length >= 9);
-            assert.ok(ticks.length <= 11);
-            assert.ok(ended);
-            assert.ok(paused);
-            assert.ok(resumed);
-            assert.ok(progresses.length && progresses.reduce((a, s) => a + s, 0) > 0);
-            assert.ok(status.elapsed - startPauseAfter < tolerance);
-            assert.ok(status.remaining - (horizont - startPauseAfter) < tolerance);
-            assert.ok(status.progress > 45 && status.progress < 55);
+            expect(end- start - horizont - pause < tolerance).toBe(true);
+            expect(ticks.length >= 9).toBe(true);
+            expect(ticks.length <= 11).toBe(true);
+            expect(ended).toBe(true);
+            expect(paused).toBe(true);
+            expect(resumed).toBe(true);
+            expect(progresses.length > 0 && progresses.reduce((a, s) => a + s, 0) > 0).toBe(true);
+            expect(status.elapsed - startPauseAfter < tolerance).toBe(true);
+            expect(status.remaining - (horizont - startPauseAfter) < tolerance).toBe(true);
+            expect(status.progress > 45 && status.progress < 55).toBe(true);
             done();
         }, horizont + pause + 10);
-    }).timeout(8000);
+    });
 
+    //// jest.setTimeout(25000);
     it('should tune as expected the countdown (0.01% tolerance)', done => {
         var horizont = 2e3,
             tolerance = 0.01,
@@ -139,11 +140,13 @@ describe('basic operations', () => {
         
         setTimeout(function () {
             var e = end - start;
-            assert.equal(e < (horizont + up*4) * (1 + tolerance), true);
-            assert.ok(tuned);
+            expect(e < (horizont + up*4) * (1 + tolerance)).toBe(true);
+            expect(tuned).toBe(true);
             done();
         }, horizont + up*4 + 10);
-    }).timeout(25000);
+    });
+
+    
     it('should stop as expected', done => {
         var horizont = 1e3,
             start, end;
@@ -158,9 +161,9 @@ describe('basic operations', () => {
             .onEnd(({at}) => {
                 var elapsed = at - start,
                     elapsed2 = end - start;
-                assert(elapsed === elapsed2);
-                assert(elapsed < 820);
-                assert(elapsed > 780);
+                expect(elapsed === elapsed2).toBe(true);
+                expect(elapsed < 820).toBe(true);
+                expect(elapsed > 780).toBe(true);
                 done()
             })
             .run(({at}) => {start = at});
@@ -168,6 +171,7 @@ describe('basic operations', () => {
             cd.end()
         }, 800)
     });
+    //jest.setTimeout(8000);
     it('should throw an error', done => {
         var horizont = 1e3;
         countdown(
@@ -179,9 +183,9 @@ describe('basic operations', () => {
             100
         )
         .onErr(function ({ error }) {
-            assert.equal(error instanceof Error, true);
+            expect(error instanceof Error).toBe(true);
             done()
         })
         .run();
-    }).timeout(8000);
+    });
 });

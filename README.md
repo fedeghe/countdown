@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/fedeghe/countdown/badge.svg?branch=master)](https://coveralls.io/github/fedeghe/countdown?branch=master)
+[![codecov](https://codecov.io/gh/fedeghe/countdown/graph/badge.svg?token=6A5Y8909U6)](https://codecov.io/gh/fedeghe/countdown)
 
 # countdown <sub><small>(v. 0.0.16)</small></sub>
 
